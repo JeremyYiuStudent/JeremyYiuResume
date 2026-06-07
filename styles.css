@@ -104,11 +104,39 @@ a {
 }
 
 .hero-image {
-  min-height: clamp(14rem, 26vw, 21rem);
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: url("images/UmbralIsland3.png") center / cover;
+  background: var(--panel-soft);
   box-shadow: var(--shadow);
+}
+
+.hero-slide-track {
+  display: flex;
+  width: 700%;
+  height: 100%;
+  animation: hero-slide 36s linear infinite;
+}
+
+.hero-slide-track img {
+  flex: 0 0 calc(100% / 7);
+  width: calc(100% / 7);
+  min-width: 0;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+@keyframes hero-slide {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(calc(-100% * 6 / 7));
+  }
 }
 
 .hero-content {
@@ -664,5 +692,12 @@ h3 {
   .project-facts div {
     grid-template-columns: 1fr;
     gap: 0.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-slide-track {
+    animation: none;
+    transform: translateX(0);
   }
 }
