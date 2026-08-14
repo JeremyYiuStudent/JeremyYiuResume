@@ -1,0 +1,4 @@
+[submodule "vendor/particle-rose"]
+	path = vendor/particle-rose
+	url = https://github.com/JeremyYiuStudent/Particle-Rose.git
+	branch = main
