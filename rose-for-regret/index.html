@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#fdfaf4" />
+    <title>A Rose for Regret</title>
+    <style>
+      :root {
+        color-scheme: light;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #fdfaf4;
+        color: #6b5a54;
+        font-family:
+          ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+        /* Phase 7 relies on these: stop Safari rubber-banding fighting drag gestures. */
+        overscroll-behavior: none;
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      #app {
+        position: fixed;
+        inset: 0;
+      }
+
+      /* No width/height here on purpose: three sets the canvas size inline and
+         a CSS override would stretch the image whenever the renderer's size
+         and the host's size briefly disagree. scene.ts drives sizing from a
+         ResizeObserver on #app instead. */
+      #app canvas {
+        display: block;
+        touch-action: none;
+      }
+
+      #stats {
+        position: fixed;
+        top: 8px;
+        left: 10px;
+        z-index: 10;
+        font:
+          11px/1.5 ui-monospace,
+          "SF Mono",
+          Menlo,
+          Consolas,
+          monospace;
+        color: #9a8f95;
+        white-space: pre;
+        pointer-events: none;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+      }
+
+      #loading {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        letter-spacing: 0.14em;
+        text-transform: lowercase;
+        color: #9a8378;
+        pointer-events: none;
+        transition: opacity 0.6s ease;
+      }
+
+      #loading.hidden {
+        opacity: 0;
+      }
+
+      #hint {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 18px;
+        text-align: center;
+        font-size: 0.72rem;
+        letter-spacing: 0.08em;
+        color: #9a8378;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 1.2s ease;
+      }
+
+      #hint.visible {
+        opacity: 1;
+      }
+
+      /* Shown by caps.ts when WebGL2 is unavailable. A black rectangle is not
+         an acceptable failure mode. */
+      #unsupported {
+        position: fixed;
+        inset: 0;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        padding: 2rem;
+        text-align: center;
+        background: radial-gradient(circle at 50% 40%, #1a0a12, #08040a 70%);
+      }
+
+      #unsupported h1 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+      }
+
+      #unsupported p {
+        margin: 0;
+        max-width: 34rem;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        color: #9a8f95;
+      }
+    </style>
+    <script type="module" crossorigin src="./assets/index-qdivEUX2.js"></script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <div id="stats"></div>
+    <div id="loading"><span>opening…</span></div>
+    <div id="hint">right-drag to turn · scroll to zoom · click to ripple · H for controls</div>
+    <div id="unsupported">
+      <h1>This browser can't run Particle Rose</h1>
+      <p>
+        The rose is drawn with a million GPU particles, which needs WebGL 2.
+        Your browser or graphics driver doesn't support it. Try a recent
+        version of Chrome, Edge, Firefox, or Safari, and check that hardware
+        acceleration is enabled.
+      </p>
+    </div>
+  </body>
+</html>
