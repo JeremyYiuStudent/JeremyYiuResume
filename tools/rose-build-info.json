@@ -1,5 +1,5 @@
 {
   "repository": "https://github.com/JeremyYiuStudent/Particle-Rose.git",
-  "commit": "65daecd23cc1d8d43cba59db8228170426a7c0f9",
-  "subject": "Dev Branch Layer"
+  "commit": "0cf6751db00c361c8cb50e90e94b309bc492f892",
+  "subject": "Fix diluted rose on mobile: density-aware pigment and portrait framing"
 }
