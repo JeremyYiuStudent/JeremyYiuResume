@@ -2,3 +2,7 @@ template.html
 
 # Local planning notes - not part of the published site.
 thoughts/
+
+# Local clone of the Particle Rose source, used only to rebuild
+# rose-for-regret/. See tools/README.md.
+vendor/

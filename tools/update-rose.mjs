@@ -1,14 +1,20 @@
 #!/usr/bin/env node
-// Rebuilds the Particle Rose bundle from vendor/particle-rose and refreshes the
-// servable copy in rose-for-regret/.
+// Rebuilds the Particle Rose bundle and refreshes the servable copy in
+// rose-for-regret/.
 //
-//   node tools/update-rose.mjs            rebuild the currently pinned commit
-//   node tools/update-rose.mjs --pull     fast-forward to upstream main, then rebuild
+//   node tools/update-rose.mjs            rebuild from the existing local clone
+//   node tools/update-rose.mjs --pull     fast-forward the clone to origin/main, then rebuild
 //   node tools/update-rose.mjs --install  force a fresh npm ci first
 //
-// The site serves rose-for-regret/ directly, so the submodule is build-time
-// only: if it is ever unavailable, the deployed page keeps working untouched.
-// Commit the regenerated rose-for-regret/ afterwards.
+// vendor/particle-rose is a plain clone that is NOT tracked by this repo (see
+// .gitignore). It deliberately used to be a git submodule; that broke the
+// GitHub Pages build, because a branch-based Pages deploy runs
+// `git submodule update --init` across the repo and has no credentials for a
+// private submodule. The failure takes down deploys for the *whole site*, not
+// just this page. Do not reintroduce the submodule while Particle-Rose is
+// private.
+//
+// Provenance instead lives in tools/rose-build-info.json, which is committed.
 
 import { execSync } from "node:child_process";
 import {
@@ -23,40 +29,44 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const PAGE_TITLE = "A Rose for Regret";
+const REPO_URL = "https://github.com/JeremyYiuStudent/Particle-Rose.git";
+const BRANCH = "main";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const sub = join(root, "vendor", "particle-rose");
+const src = join(root, "vendor", "particle-rose");
 const out = join(root, "rose-for-regret");
+const infoPath = join(root, "tools", "rose-build-info.json");
 const args = new Set(process.argv.slice(2));
 const run = (cmd, cwd = root) => execSync(cmd, { cwd, stdio: "inherit" });
+const capture = (cmd, cwd) => execSync(cmd, { cwd }).toString().trim();
+
+const cloned = existsSync(join(src, "package.json"));
+if (!cloned) {
+  console.log(`Cloning ${REPO_URL} into vendor/particle-rose ...`);
+  run(`git clone --branch ${BRANCH} ${REPO_URL} vendor/particle-rose`);
+}
 
 const pulling = args.has("--pull");
-
 if (pulling) {
-  run("git submodule update --remote --init vendor/particle-rose");
+  // --ff-only so a diverged or dirty vendor clone fails loudly instead of
+  // quietly building something that is not upstream.
+  run(`git pull --ff-only origin ${BRANCH}`, src);
 }
 
-if (!existsSync(join(sub, "package.json"))) {
-  console.error(
-    "vendor/particle-rose is empty. Run:\n  git submodule update --init --recursive",
-  );
-  process.exit(1);
-}
-
-// Always reinstall after a pull: the upstream lockfile may have moved, and a
-// stale node_modules would build the wrong dependency tree without complaining.
-if (pulling || args.has("--install") || !existsSync(join(sub, "node_modules"))) {
-  run("npm ci", sub);
+// Always reinstall after a clone or pull: the upstream lockfile may have moved,
+// and a stale node_modules would build the wrong dependency tree silently.
+if (!cloned || pulling || args.has("--install") || !existsSync(join(src, "node_modules"))) {
+  run("npm ci", src);
 }
 
 // --sourcemap=false matters: upstream hardcodes build.sourcemap true, which
 // emits a 3 MB .map next to a 670 KB bundle. npm appends this to the chained
 // `vite build`, leaving the `tsc --noEmit` step intact.
-run("npm run build -- --sourcemap=false", sub);
+run("npm run build -- --sourcemap=false", src);
 
-const dist = join(sub, "dist");
+const dist = join(src, "dist");
 if (!existsSync(join(dist, "index.html"))) {
-  console.error(`Build produced no ${join(dist, "index.html")} — aborting.`);
+  console.error(`Build produced no ${join(dist, "index.html")} - aborting.`);
   process.exit(1);
 }
 
@@ -65,8 +75,8 @@ if (!existsSync(join(dist, "index.html"))) {
 rmSync(out, { recursive: true, force: true });
 cpSync(dist, out, { recursive: true });
 
-// Host-specific tweaks live here rather than upstream, so the submodule stays
-// merge-free and these are re-applied on every build by construction.
+// Host-specific tweaks live here rather than upstream, so the vendor clone
+// stays merge-free and these are re-applied on every build by construction.
 const indexPath = join(out, "index.html");
 let html = readFileSync(indexPath, "utf8");
 
@@ -90,7 +100,7 @@ for (const { what, find, replace } of edits) {
     // would ship an indexable page named "Particle Rose" and nobody would know.
     console.error(
       `Could not apply ${what}: pattern ${find} no longer matches the built index.html.\n` +
-        `Upstream markup changed — update the anchors in tools/update-rose.mjs.`,
+        `Upstream markup changed - update the anchors in tools/update-rose.mjs.`,
     );
     process.exit(1);
   }
@@ -99,12 +109,20 @@ for (const { what, find, replace } of edits) {
 
 writeFileSync(indexPath, html);
 
-const assets = readdirSync(join(out, "assets"));
-const sha = execSync("git rev-parse --short HEAD", { cwd: sub }).toString().trim();
-const subject = execSync("git log -1 --pretty=%s", { cwd: sub }).toString().trim();
+// Committed provenance, standing in for what the submodule gitlink used to
+// record. No timestamp on purpose: rebuilding the same commit must produce an
+// identical file, so a no-op rebuild stays a no-op in git.
+const commit = capture("git rev-parse HEAD", src);
+const subject = capture("git log -1 --pretty=%s", src);
+writeFileSync(
+  infoPath,
+  JSON.stringify({ repository: REPO_URL, commit, subject }, null, 2) + "\n",
+);
 
+const short = commit.slice(0, 7);
+const assets = readdirSync(join(out, "assets"));
 console.log(
-  `\nrose-for-regret/ rebuilt from particle-rose ${sha} — ${subject}\n` +
+  `\nrose-for-regret/ rebuilt from particle-rose ${short} - ${subject}\n` +
     `  assets: ${assets.join(", ")}\n` +
-    `  next:   git add -A && git commit -m "Update rose-for-regret (particle-rose ${sha})"`,
+    `  next:   git add -A && git commit -m "Update rose-for-regret (particle-rose ${short})"`,
 );

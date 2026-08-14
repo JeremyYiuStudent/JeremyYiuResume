@@ -18,8 +18,8 @@ carries `noindex, nofollow`. Reaching it requires typing the URL.
 
 ### Updating it
 
-Source lives in the `vendor/particle-rose` submodule. To pull the latest
-upstream changes and refresh the deployed copy:
+The source is a plain clone at `vendor/particle-rose`, which is **not tracked by
+this repo** (see `.gitignore`). `update-rose.mjs` creates it on first run.
 
 ```bash
 node tools/update-rose.mjs --pull
@@ -28,20 +28,18 @@ git commit -m "Update rose-for-regret (particle-rose <sha>)"
 git push
 ```
 
-The script prints the exact commit line to use. Recording the upstream SHA
-there means this repo's history alone answers "which version of the rose is
-live", without needing access to the other repo.
-
-Other forms:
+The script prints the exact commit line to use, and records the upstream commit
+in `tools/rose-build-info.json` so this repo's history alone answers "which
+version of the rose is live".
 
 | Command | Does |
 | --- | --- |
-| `node tools/update-rose.mjs` | Rebuild the currently pinned commit, no upstream fetch |
-| `node tools/update-rose.mjs --pull` | Fast-forward the submodule to `origin/main`, reinstall, rebuild |
+| `node tools/update-rose.mjs` | Rebuild from the existing clone, no fetch |
+| `node tools/update-rose.mjs --pull` | Fast-forward the clone to `origin/main`, reinstall, rebuild |
 | `node tools/update-rose.mjs --install` | Force `npm ci` before building |
 
 Re-running is safe: the script regenerates `rose-for-regret/` from scratch each
-time, so a second run leaves the tree unchanged.
+time, so rebuilding the same upstream commit leaves the tree unchanged.
 
 After a `--pull`, it's worth running the upstream test suite before committing:
 
@@ -49,16 +47,26 @@ After a `--pull`, it's worth running the upstream test suite before committing:
 npm --prefix vendor/particle-rose run check
 ```
 
+### Why this is a plain clone and not a submodule
+
+It was a submodule first. That broke the GitHub Pages build.
+
+A branch-based Pages deploy runs `git submodule update --init` across the repo,
+and it has no credentials for a private repository — so the build fails and
+**the entire site stops deploying**, not just this page. Already-published pages
+keep serving from the last good build, which makes the failure quiet and easy to
+miss.
+
+Do not reintroduce the submodule while Particle-Rose is private. If it is ever
+made public, a submodule becomes safe again — but the clone approach works
+either way and needs no `.gitmodules`.
+
 ### Requirements
 
-Node (any recent version; built with 24.x) and access to the Particle-Rose
+Node (any recent version; built with 24.x) and read access to the Particle-Rose
 repository, which is **private**.
 
 That access is only needed to *rebuild* the rose. The live site never touches
-the submodule — Pages serves the committed `rose-for-regret/` directory — so a
-clone without submodule access still deploys the site correctly. It just can't
-regenerate the page. If `vendor/particle-rose` is empty after cloning:
-
-```bash
-git submodule update --init --recursive
-```
+the clone — Pages serves the committed `rose-for-regret/` directory — so a fresh
+clone of this repo without that access still deploys the site correctly. It just
+can't regenerate the page.
