@@ -59,6 +59,11 @@ if (!cloned || pulling || args.has("--install") || !existsSync(join(src, "node_m
   run("npm ci", src);
 }
 
+// `npm run build` deliberately, never `npm run build:all`. Upstream splits the
+// project into a stable page (index.html) and a dev lab (dev.html); the default
+// build emits the stable page alone, so nothing under src/dev/ can reach this
+// site. Only the stable page is deployed. Do not switch this to build:all.
+//
 // --sourcemap=false matters: upstream hardcodes build.sourcemap true, which
 // emits a 3 MB .map next to a 670 KB bundle. npm appends this to the chained
 // `vite build`, leaving the `tsc --noEmit` step intact.
@@ -67,6 +72,17 @@ run("npm run build -- --sourcemap=false", src);
 const dist = join(src, "dist");
 if (!existsSync(join(dist, "index.html"))) {
   console.error(`Build produced no ${join(dist, "index.html")} - aborting.`);
+  process.exit(1);
+}
+
+// Stable-only is currently a property of upstream's default build rather than
+// of anything this script does, which makes it exactly the kind of guarantee
+// that can lapse without anyone noticing. Check it instead of trusting it.
+if (existsSync(join(dist, "dev.html"))) {
+  console.error(
+    "Build emitted dev.html - the dev lab must not be deployed to this site.\n" +
+      "Upstream's default build changed, or build:all ran. Aborting before copy.",
+  );
   process.exit(1);
 }
 
