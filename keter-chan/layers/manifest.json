@@ -1,0 +1,350 @@
+{
+  "master": [
+    1024,
+    1040
+  ],
+  "centreX": 514,
+  "layers": [
+    {
+      "name": "wing-l",
+      "file": "layers/wing-l.png",
+      "size": [
+        307,
+        661
+      ],
+      "offset": [
+        125,
+        96
+      ],
+      "anchor": [
+        330,
+        214
+      ],
+      "anchorInMaster": [
+        455,
+        310
+      ]
+    },
+    {
+      "name": "wing-r",
+      "file": "layers/wing-r.png",
+      "size": [
+        306,
+        661
+      ],
+      "offset": [
+        599,
+        96
+      ],
+      "anchor": [
+        -26,
+        214
+      ],
+      "anchorInMaster": [
+        573,
+        310
+      ]
+    },
+    {
+      "name": "upper-arm-l",
+      "file": "layers/upper-arm-l.png",
+      "size": [
+        173,
+        257
+      ],
+      "offset": [
+        294,
+        262
+      ],
+      "anchor": [
+        138,
+        34
+      ],
+      "anchorInMaster": [
+        432,
+        296
+      ]
+    },
+    {
+      "name": "forearm-l",
+      "file": "layers/forearm-l.png",
+      "size": [
+        99,
+        159
+      ],
+      "offset": [
+        266,
+        434
+      ],
+      "anchor": [
+        65,
+        34
+      ],
+      "anchorInMaster": [
+        331,
+        468
+      ]
+    },
+    {
+      "name": "upper-arm-r",
+      "file": "layers/upper-arm-r.png",
+      "size": [
+        171,
+        255
+      ],
+      "offset": [
+        564,
+        262
+      ],
+      "anchor": [
+        34,
+        34
+      ],
+      "anchorInMaster": [
+        598,
+        296
+      ]
+    },
+    {
+      "name": "shoulder-l",
+      "file": "layers/shoulder-l.png",
+      "size": [
+        103,
+        135
+      ],
+      "offset": [
+        402,
+        234
+      ],
+      "anchor": [
+        30,
+        62
+      ],
+      "anchorInMaster": [
+        432,
+        296
+      ]
+    },
+    {
+      "name": "shoulder-r",
+      "file": "layers/shoulder-r.png",
+      "size": [
+        102,
+        136
+      ],
+      "offset": [
+        526,
+        233
+      ],
+      "anchor": [
+        72,
+        63
+      ],
+      "anchorInMaster": [
+        598,
+        296
+      ]
+    },
+    {
+      "name": "forearm-r",
+      "file": "layers/forearm-r.png",
+      "size": [
+        105,
+        159
+      ],
+      "offset": [
+        659,
+        434
+      ],
+      "anchor": [
+        32,
+        34
+      ],
+      "anchorInMaster": [
+        691,
+        468
+      ]
+    },
+    {
+      "name": "thigh-l",
+      "file": "layers/thigh-l.png",
+      "size": [
+        84,
+        313
+      ],
+      "offset": [
+        430,
+        522
+      ],
+      "anchor": [
+        48,
+        44
+      ],
+      "anchorInMaster": [
+        478,
+        566
+      ]
+    },
+    {
+      "name": "shin-l",
+      "file": "layers/shin-l.png",
+      "size": [
+        60,
+        235
+      ],
+      "offset": [
+        450,
+        746
+      ],
+      "anchor": [
+        27,
+        44
+      ],
+      "anchorInMaster": [
+        477,
+        790
+      ]
+    },
+    {
+      "name": "thigh-r",
+      "file": "layers/thigh-r.png",
+      "size": [
+        86,
+        313
+      ],
+      "offset": [
+        514,
+        522
+      ],
+      "anchor": [
+        36,
+        44
+      ],
+      "anchorInMaster": [
+        550,
+        566
+      ]
+    },
+    {
+      "name": "shin-r",
+      "file": "layers/shin-r.png",
+      "size": [
+        60,
+        235
+      ],
+      "offset": [
+        522,
+        746
+      ],
+      "anchor": [
+        30,
+        44
+      ],
+      "anchorInMaster": [
+        552,
+        790
+      ]
+    },
+    {
+      "name": "foot-l",
+      "file": "layers/foot-l.png",
+      "size": [
+        58,
+        106
+      ],
+      "offset": [
+        452,
+        920
+      ],
+      "anchor": [
+        35,
+        30
+      ],
+      "anchorInMaster": [
+        487,
+        950
+      ]
+    },
+    {
+      "name": "foot-r",
+      "file": "layers/foot-r.png",
+      "size": [
+        56,
+        108
+      ],
+      "offset": [
+        524,
+        920
+      ],
+      "anchor": [
+        22,
+        30
+      ],
+      "anchorInMaster": [
+        546,
+        950
+      ]
+    },
+    {
+      "name": "torso",
+      "file": "layers/torso.png",
+      "size": [
+        226,
+        377
+      ],
+      "offset": [
+        402,
+        215
+      ],
+      "anchor": [
+        112,
+        351
+      ],
+      "anchorInMaster": [
+        514,
+        566
+      ]
+    },
+    {
+      "name": "head-open",
+      "file": "layers/head-open.png",
+      "size": [
+        308,
+        308
+      ],
+      "offset": [
+        357,
+        -32
+      ],
+      "anchor": [
+        157,
+        270
+      ],
+      "anchorInMaster": [
+        514,
+        238
+      ]
+    },
+    {
+      "name": "head-closed",
+      "file": "layers/head-closed.png",
+      "size": [
+        308,
+        308
+      ],
+      "offset": [
+        357,
+        -32
+      ],
+      "anchor": [
+        157,
+        270
+      ],
+      "anchorInMaster": [
+        514,
+        238
+      ],
+      "blinkFrameFor": "head-open"
+    }
+  ]
+}

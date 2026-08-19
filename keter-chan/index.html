@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <meta
+      name="description"
+      content="Keter — an interactable winged companion who watches your cursor, can be picked up, and wanders when left alone."
+    />
+    <title>Keter</title>
+    <script type="module" crossorigin src="/keter-chan/assets/index-DucdhX0-.js"></script>
+    <link rel="stylesheet" crossorigin href="/keter-chan/assets/index-eCImC2YE.css">
+  </head>
+  <body>
+    <div id="stage" class="stage">
+      <!-- Layer order, back to front. Phase 2/3 mount the character SVG into
+           #character-layer; Phase 7 draws into #fx-canvas. -->
+      <canvas id="starfield-canvas" class="layer" aria-hidden="true"></canvas>
+      <div id="character-layer" class="layer"></div>
+      <canvas id="fx-canvas" class="layer" aria-hidden="true"></canvas>
+    </div>
+  </body>
+</html>

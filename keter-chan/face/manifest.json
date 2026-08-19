@@ -1,0 +1,315 @@
+{
+  "source": "art/head3-open.cut.png",
+  "size": [
+    1024,
+    1024
+  ],
+  "feather": 10,
+  "parts": [
+    {
+      "name": "face-base",
+      "file": "face/face-base.png",
+      "size": [
+        1024,
+        1024
+      ],
+      "offset": [
+        0,
+        0
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "name": "neck-base",
+      "file": "face/neck-base.png",
+      "size": [
+        1024,
+        1024
+      ],
+      "offset": [
+        0,
+        0
+      ],
+      "pivot": [
+        0,
+        0
+      ]
+    },
+    {
+      "name": "eye-l",
+      "file": "face/eye-l.png",
+      "size": [
+        153,
+        113
+      ],
+      "offset": [
+        353,
+        560
+      ],
+      "pivot": [
+        76,
+        56
+      ],
+      "pivotInHead": [
+        429,
+        616
+      ],
+      "opening": {
+        "cx": 429,
+        "cy": 616,
+        "rx": 76,
+        "ry": 56
+      }
+    },
+    {
+      "name": "eye-l-iris",
+      "file": "face/eye-l-iris.png",
+      "size": [
+        153,
+        113
+      ],
+      "offset": [
+        353,
+        560
+      ],
+      "pivot": [
+        76,
+        56
+      ],
+      "pivotInHead": [
+        429,
+        616
+      ]
+    },
+    {
+      "name": "eye-l-lash",
+      "file": "face/eye-l-lash.png",
+      "size": [
+        153,
+        113
+      ],
+      "offset": [
+        353,
+        560
+      ],
+      "pivot": [
+        76,
+        56
+      ],
+      "pivotInHead": [
+        429,
+        616
+      ]
+    },
+    {
+      "name": "eye-l-white",
+      "file": "face/eye-l-white.png",
+      "size": [
+        153,
+        113
+      ],
+      "offset": [
+        353,
+        560
+      ],
+      "pivot": [
+        76,
+        56
+      ],
+      "pivotInHead": [
+        429,
+        616
+      ]
+    },
+    {
+      "name": "eye-l-closed",
+      "file": "face/eye-l-closed.png",
+      "size": [
+        153,
+        113
+      ],
+      "offset": [
+        353,
+        560
+      ],
+      "pivot": [
+        76,
+        56
+      ],
+      "pivotInHead": [
+        429,
+        616
+      ]
+    },
+    {
+      "name": "eye-r",
+      "file": "face/eye-r.png",
+      "size": [
+        153,
+        113
+      ],
+      "offset": [
+        525,
+        560
+      ],
+      "pivot": [
+        76,
+        56
+      ],
+      "pivotInHead": [
+        601,
+        616
+      ],
+      "opening": {
+        "cx": 601,
+        "cy": 616,
+        "rx": 76,
+        "ry": 56
+      }
+    },
+    {
+      "name": "eye-r-iris",
+      "file": "face/eye-r-iris.png",
+      "size": [
+        153,
+        113
+      ],
+      "offset": [
+        525,
+        560
+      ],
+      "pivot": [
+        76,
+        56
+      ],
+      "pivotInHead": [
+        601,
+        616
+      ]
+    },
+    {
+      "name": "eye-r-lash",
+      "file": "face/eye-r-lash.png",
+      "size": [
+        153,
+        113
+      ],
+      "offset": [
+        525,
+        560
+      ],
+      "pivot": [
+        76,
+        56
+      ],
+      "pivotInHead": [
+        601,
+        616
+      ]
+    },
+    {
+      "name": "eye-r-white",
+      "file": "face/eye-r-white.png",
+      "size": [
+        153,
+        113
+      ],
+      "offset": [
+        525,
+        560
+      ],
+      "pivot": [
+        76,
+        56
+      ],
+      "pivotInHead": [
+        601,
+        616
+      ]
+    },
+    {
+      "name": "eye-r-closed",
+      "file": "face/eye-r-closed.png",
+      "size": [
+        153,
+        113
+      ],
+      "offset": [
+        525,
+        560
+      ],
+      "pivot": [
+        76,
+        56
+      ],
+      "pivotInHead": [
+        601,
+        616
+      ]
+    },
+    {
+      "name": "brow-l",
+      "file": "face/brow-l.png",
+      "size": [
+        125,
+        63
+      ],
+      "offset": [
+        370,
+        520
+      ],
+      "pivot": [
+        62,
+        31
+      ],
+      "pivotInHead": [
+        432,
+        551
+      ]
+    },
+    {
+      "name": "brow-r",
+      "file": "face/brow-r.png",
+      "size": [
+        125,
+        63
+      ],
+      "offset": [
+        537,
+        518
+      ],
+      "pivot": [
+        62,
+        31
+      ],
+      "pivotInHead": [
+        599,
+        549
+      ]
+    },
+    {
+      "name": "mouth",
+      "file": "face/mouth.png",
+      "size": [
+        91,
+        63
+      ],
+      "offset": [
+        469,
+        705
+      ],
+      "pivot": [
+        45,
+        31
+      ],
+      "pivotInHead": [
+        514,
+        736
+      ]
+    }
+  ],
+  "neckSplit": 790
+}
