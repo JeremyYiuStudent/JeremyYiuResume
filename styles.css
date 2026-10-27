@@ -115,14 +115,14 @@ a {
 
 .hero-slide-track {
   display: flex;
-  width: 800%;
+  width: 900%;
   height: 100%;
-  animation: hero-slide 36s linear infinite;
+  animation: hero-slide 41s linear infinite;
 }
 
 .hero-slide-track img {
-  flex: 0 0 calc(100% / 8);
-  width: calc(100% / 8);
+  flex: 0 0 calc(100% / 9);
+  width: calc(100% / 9);
   min-width: 0;
   height: 100%;
   object-fit: cover;
@@ -135,7 +135,7 @@ a {
   }
 
   to {
-    transform: translateX(calc(-100% * 7 / 8));
+    transform: translateX(calc(-100% * 8 / 9));
   }
 }
 
