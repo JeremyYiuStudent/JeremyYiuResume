@@ -1,0 +1,3 @@
+[submodule "divination"]
+	path = divination
+	url = https://github.com/JeremyYiuStudent/Divination.git
