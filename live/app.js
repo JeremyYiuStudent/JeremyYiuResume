@@ -283,8 +283,8 @@
     showToast('Connected ♥');
 
     conn.on('data',  handleMessage);
-    conn.on('close', onConnClose);
-    conn.on('error', function () { onConnClose(); });
+    conn.on('close', function () { if (S.conn === conn) onConnClose(); });
+    conn.on('error', function () { if (S.conn === conn) onConnClose(); });
 
     /* If still on setup screen, transition to main */
     if (el.setup.classList.contains('active')) {
@@ -389,14 +389,13 @@
     var wantCam = video && S.preCamOn;
 
     navigator.mediaDevices.getUserMedia({
-      video: video ? { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } } : false,
+      video: wantCam ? { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } } : false,
       audio: true,
     }).then(function (stream) {
       if (!wantMic) stream.getAudioTracks().forEach(function (t) { t.enabled = false; });
-      if (video && !wantCam) stream.getVideoTracks().forEach(function (t) { t.enabled = false; });
       S.localStream      = stream;
       el.vidLocal.srcObject = stream;
-      el.vidLocal.hidden    = !video;
+      el.vidLocal.hidden    = !wantCam;
       S.micOn = wantMic;
       S.camOn = wantCam;
       updateCallBtns();
@@ -405,7 +404,9 @@
       setupMediaCall(call);
     }).catch(function (err) {
       console.error('[Live] getUserMedia:', err);
-      showToast('Camera / mic access denied');
+      showToast(err.name === 'NotAllowedError' ? 'Permission denied — check site settings'
+        : err.name === 'NotFoundError' ? 'No camera / mic found'
+        : 'Media error: ' + err.name);
       doEndCall(false);
     });
   }
@@ -421,14 +422,13 @@
     var wantCam = wantVideo && S.preCamOn;
 
     navigator.mediaDevices.getUserMedia({
-      video: wantVideo ? { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } } : false,
+      video: wantCam ? { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } } : false,
       audio: true,
     }).then(function (stream) {
       if (!wantMic) stream.getAudioTracks().forEach(function (t) { t.enabled = false; });
-      if (wantVideo && !wantCam) stream.getVideoTracks().forEach(function (t) { t.enabled = false; });
       S.localStream         = stream;
       el.vidLocal.srcObject = stream;
-      el.vidLocal.hidden    = !wantVideo;
+      el.vidLocal.hidden    = !wantCam;
       S.micOn = wantMic;
       S.camOn = wantCam;
       updateCallBtns();
@@ -436,7 +436,9 @@
       setupMediaCall(call);
     }).catch(function (err) {
       console.error('[Live] auto-answer getUserMedia:', err);
-      showToast('Camera / mic access denied');
+      showToast(err.name === 'NotAllowedError' ? 'Permission denied — check site settings'
+        : err.name === 'NotFoundError' ? 'No camera / mic found'
+        : 'Media error: ' + err.name);
       doEndCall(false);
     });
   }
