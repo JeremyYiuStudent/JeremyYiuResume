@@ -382,8 +382,43 @@
   function mediaErrorMsg(err) {
     if (err.name === 'NotAllowedError')  return 'Permission denied — check site settings';
     if (err.name === 'NotFoundError')    return 'No camera / mic found';
-    if (err.name === 'NotReadableError') return 'Camera / mic in use by another app';
+    if (err.name === 'NotReadableError') return 'Camera busy — close other apps and retry';
     return 'Media error: ' + err.name;
+  }
+
+  function getMedia(wantCam, cb, fail) {
+    var attempts = wantCam
+      ? [
+          { video: { facingMode: 'user' }, audio: true },
+          { video: true, audio: true },
+          { video: false, audio: true },
+        ]
+      : [{ video: false, audio: true }];
+
+    function tryNext(i) {
+      if (i >= attempts.length) { fail(); return; }
+      navigator.mediaDevices.getUserMedia(attempts[i])
+        .then(function (stream) {
+          var hasCam = stream.getVideoTracks().length > 0;
+          if (wantCam && !hasCam && i < attempts.length - 1) {
+            stream.getTracks().forEach(function (t) { t.stop(); });
+            tryNext(i + 1);
+            return;
+          }
+          if (wantCam && !hasCam) showToast('Camera unavailable — audio only');
+          cb(stream, hasCam);
+        })
+        .catch(function (err) {
+          console.error('[Live] getUserMedia attempt ' + (i + 1) + ':', err.name);
+          if (i < attempts.length - 1) {
+            tryNext(i + 1);
+          } else {
+            showToast(mediaErrorMsg(err));
+            fail();
+          }
+        });
+    }
+    tryNext(0);
   }
 
   function startCall(video) {
@@ -395,7 +430,7 @@
     var wantMic = S.preMicOn;
     var wantCam = video && S.preCamOn;
 
-    function onStream(stream, hasCam) {
+    getMedia(wantCam, function (stream, hasCam) {
       if (!wantMic) stream.getAudioTracks().forEach(function (t) { t.enabled = false; });
       S.localStream      = stream;
       el.vidLocal.srcObject = stream;
@@ -406,31 +441,7 @@
 
       var call = S.peer.call(partnerPeerId(), stream, { metadata: { video: video } });
       setupMediaCall(call);
-    }
-
-    var constraints = {
-      video: wantCam ? { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } } : false,
-      audio: true,
-    };
-
-    navigator.mediaDevices.getUserMedia(constraints)
-      .then(function (s) { onStream(s, wantCam); })
-      .catch(function (err) {
-        console.error('[Live] getUserMedia:', err);
-        if (!wantCam) {
-          showToast(mediaErrorMsg(err));
-          doEndCall(false);
-          return;
-        }
-        showToast('Camera unavailable — audio only');
-        navigator.mediaDevices.getUserMedia({ video: false, audio: true })
-          .then(function (s) { onStream(s, false); })
-          .catch(function (err2) {
-            console.error('[Live] getUserMedia fallback:', err2);
-            showToast(mediaErrorMsg(err2));
-            doEndCall(false);
-          });
-      });
+    }, function () { doEndCall(false); });
   }
 
   function handleIncomingCall(call) {
@@ -443,7 +454,7 @@
     var wantMic = S.preMicOn;
     var wantCam = wantVideo && S.preCamOn;
 
-    function onStream(stream, hasCam) {
+    getMedia(wantCam, function (stream, hasCam) {
       if (!wantMic) stream.getAudioTracks().forEach(function (t) { t.enabled = false; });
       S.localStream         = stream;
       el.vidLocal.srcObject = stream;
@@ -453,31 +464,7 @@
       updateCallBtns();
       call.answer(stream);
       setupMediaCall(call);
-    }
-
-    var constraints = {
-      video: wantCam ? { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } } : false,
-      audio: true,
-    };
-
-    navigator.mediaDevices.getUserMedia(constraints)
-      .then(function (s) { onStream(s, wantCam); })
-      .catch(function (err) {
-        console.error('[Live] auto-answer getUserMedia:', err);
-        if (!wantCam) {
-          showToast(mediaErrorMsg(err));
-          doEndCall(false);
-          return;
-        }
-        showToast('Camera unavailable — audio only');
-        navigator.mediaDevices.getUserMedia({ video: false, audio: true })
-          .then(function (s) { onStream(s, false); })
-          .catch(function (err2) {
-            console.error('[Live] auto-answer fallback:', err2);
-            showToast(mediaErrorMsg(err2));
-            doEndCall(false);
-          });
-      });
+    }, function () { doEndCall(false); });
   }
 
   function setupMediaCall(call) {
