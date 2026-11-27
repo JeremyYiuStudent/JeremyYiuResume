@@ -177,6 +177,76 @@
   }
 
   /* ============================================================
+     Soundboard sounds (synthesized — no external files)
+     ============================================================ */
+  function playAlarm() {
+    if (!AudioCtx) return;
+    var ctx = new AudioCtx();
+    var now = ctx.currentTime;
+    for (var i = 0; i < 6; i++) {
+      var t = now + i * 0.22;
+      var osc = ctx.createOscillator();
+      var g   = ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(i % 2 === 0 ? 880 : 700, t);
+      g.gain.setValueAtTime(0.15, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+      osc.connect(g); g.connect(ctx.destination);
+      osc.start(t); osc.stop(t + 0.18);
+    }
+  }
+
+  function playKiss() {
+    if (!AudioCtx) return;
+    var ctx = new AudioCtx();
+    var now = ctx.currentTime;
+    var osc = ctx.createOscillator();
+    var g   = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(1200, now);
+    osc.frequency.exponentialRampToValueAtTime(400, now + 0.08);
+    osc.frequency.setValueAtTime(1400, now + 0.08);
+    osc.frequency.exponentialRampToValueAtTime(500, now + 0.18);
+    g.gain.setValueAtTime(0.14, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+    osc.connect(g); g.connect(ctx.destination);
+    osc.start(now); osc.stop(now + 0.22);
+  }
+
+  function playGiggle() {
+    if (!AudioCtx) return;
+    var ctx = new AudioCtx();
+    var now = ctx.currentTime;
+    for (var i = 0; i < 5; i++) {
+      var t = now + i * 0.12;
+      var osc = ctx.createOscillator();
+      var g   = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(500 + (i % 2) * 180, t);
+      osc.frequency.exponentialRampToValueAtTime(300, t + 0.09);
+      g.gain.setValueAtTime(0.12, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
+      osc.connect(g); g.connect(ctx.destination);
+      osc.start(t); osc.stop(t + 0.09);
+    }
+  }
+
+  function playDoorbell() {
+    if (!AudioCtx) return;
+    var ctx = new AudioCtx();
+    var now = ctx.currentTime;
+    tone(659.25, now,        0.5, 0.14, ctx);   // E5
+    tone(523.25, now + 0.35, 0.5, 0.14, ctx);   // C5
+  }
+
+  var soundMap = {
+    alarm:    playAlarm,
+    kiss:     playKiss,
+    giggle:   playGiggle,
+    doorbell: playDoorbell,
+  };
+
+  /* ============================================================
      UI
      ============================================================ */
   function showScreen(name) {
@@ -201,6 +271,8 @@
     el.btnVideo.disabled  = !on;
     el.btnAudio.disabled  = !on;
     el.btnTap.disabled    = !on;
+    var sbs = document.querySelectorAll('.sb-btn');
+    for (var i = 0; i < sbs.length; i++) sbs[i].disabled = !on;
   }
 
   var toastTimer;
@@ -358,6 +430,7 @@
     if (!msg || !msg.type) return;
     switch (msg.type) {
       case 'tap':      receiveTap(); break;
+      case 'sound':    receiveSound(msg.name); break;
       case 'call-end': doEndCall(false); break;
       case 'ping':     send({ type: 'pong' }); break;
       case 'pong':     receivedHeartbeat(); break;
@@ -411,6 +484,23 @@
     void el.tapOverlay.offsetWidth;          // reflow to restart anim
     el.tapOverlay.classList.add('flash');
     if (S.inCall) showToast('♥');
+  }
+
+  function sendSound(name) {
+    if (!S.connected) return;
+    send({ type: 'sound', name: name });
+    if (soundMap[name]) soundMap[name]();
+  }
+
+  function receiveSound(name) {
+    if (soundMap[name]) soundMap[name]();
+    if (navigator.vibrate) navigator.vibrate([60, 30, 60]);
+    showToast(
+      name === 'alarm'    ? '⏰' :
+      name === 'kiss'     ? '💋' :
+      name === 'giggle'   ? '😄' :
+      name === 'doorbell' ? '🔔' : '🔊'
+    );
   }
 
   /* ============================================================
@@ -613,6 +703,10 @@
   el.btnTap.addEventListener('click', sendTap);
   el.btnVideo.addEventListener('click', function () { startCall(true);  });
   el.btnAudio.addEventListener('click', function () { startCall(false); });
+
+  document.querySelectorAll('.sb-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () { sendSound(btn.dataset.sound); });
+  });
 
   el.btnSettings.addEventListener('click', openSettings);
   el.btnCloseSt.addEventListener('click', closeSettings);

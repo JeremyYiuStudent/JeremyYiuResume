@@ -189,6 +189,24 @@ html, body {
 
 .hint { color: var(--muted); font-size: .85rem; }
 
+/* Soundboard */
+.soundboard {
+  display: flex; gap: 10px; justify-content: center;
+  padding: 4px 16px 10px;
+}
+.sb-btn {
+  width: 50px; height: 50px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.08);
+  background: var(--surface);
+  font-size: 1.4rem;
+  cursor: pointer;
+  transition: transform .15s, background .15s;
+  display: flex; align-items: center; justify-content: center;
+}
+.sb-btn:active { transform: scale(.88); background: var(--surface-h); }
+.sb-btn:disabled { opacity: .35; pointer-events: none; }
+
 /* Pre-call toggles */
 .pre-call-toggles {
   display: flex; gap: 10px; justify-content: center;
