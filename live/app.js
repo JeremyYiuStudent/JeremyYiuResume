@@ -30,6 +30,8 @@
     reconnTimer: null,
     tapLock    : false,
     connecting : false,
+    preMicOn   : true,
+    preCamOn   : true,
   };
 
   /* ---- DOM helpers ---- */
@@ -58,6 +60,8 @@
     btnReset    : $('#btn-reset'),
     settInvRow  : $('#settings-invite-row'),
     btnCopySt   : $('#btn-copy-settings'),
+    btnPreMic   : $('#btn-pre-mic'),
+    btnPreCam   : $('#btn-pre-cam'),
     vidRemote   : $('#vid-remote'),
     vidLocal    : $('#vid-local'),
     callStatus  : $('#call-status'),
@@ -90,6 +94,7 @@
     try {
       localStorage.setItem(CFG.STORAGE_KEY, JSON.stringify({
         roomCode: S.roomCode, role: S.role, autoAnswer: S.autoAnswer,
+        preMicOn: S.preMicOn, preCamOn: S.preCamOn,
       }));
     } catch (e) { /* private browsing */ }
   }
@@ -101,6 +106,8 @@
         S.roomCode   = d.roomCode;
         S.role       = d.role;
         S.autoAnswer = d.autoAnswer !== false;
+        S.preMicOn   = d.preMicOn !== false;
+        S.preCamOn   = d.preCamOn !== false;
         return true;
       }
     } catch (e) { /* missing or corrupt */ }
@@ -378,15 +385,20 @@
     showScreen('call');
     el.callStatus.hidden = false;
 
+    var wantMic = S.preMicOn;
+    var wantCam = video && S.preCamOn;
+
     navigator.mediaDevices.getUserMedia({
       video: video ? { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } } : false,
       audio: true,
     }).then(function (stream) {
+      if (!wantMic) stream.getAudioTracks().forEach(function (t) { t.enabled = false; });
+      if (video && !wantCam) stream.getVideoTracks().forEach(function (t) { t.enabled = false; });
       S.localStream      = stream;
       el.vidLocal.srcObject = stream;
       el.vidLocal.hidden    = !video;
-      S.micOn = true;
-      S.camOn = video;
+      S.micOn = wantMic;
+      S.camOn = wantCam;
       updateCallBtns();
 
       var call = S.peer.call(partnerPeerId(), stream, { metadata: { video: video } });
@@ -405,15 +417,20 @@
     el.callStatus.hidden = false;
 
     var wantVideo = call.metadata && call.metadata.video !== false;
+    var wantMic = S.preMicOn;
+    var wantCam = wantVideo && S.preCamOn;
+
     navigator.mediaDevices.getUserMedia({
       video: wantVideo ? { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } } : false,
       audio: true,
     }).then(function (stream) {
+      if (!wantMic) stream.getAudioTracks().forEach(function (t) { t.enabled = false; });
+      if (wantVideo && !wantCam) stream.getVideoTracks().forEach(function (t) { t.enabled = false; });
       S.localStream         = stream;
       el.vidLocal.srcObject = stream;
       el.vidLocal.hidden    = !wantVideo;
-      S.micOn = true;
-      S.camOn = wantVideo;
+      S.micOn = wantMic;
+      S.camOn = wantCam;
       updateCallBtns();
       call.answer(stream);
       setupMediaCall(call);
@@ -541,6 +558,26 @@
   });
   el.btnReset.addEventListener('click', resetRoom);
 
+  /* Pre-call toggle pills */
+  function updatePreCallPills() {
+    el.btnPreMic.className = 'pill ' + (S.preMicOn ? 'on' : 'off');
+    el.btnPreMic.innerHTML = S.preMicOn ? '&#127908; Mic on' : '&#128263; Mic off';
+    el.btnPreCam.className = 'pill ' + (S.preCamOn ? 'on' : 'off');
+    el.btnPreCam.innerHTML = S.preCamOn ? '&#128247; Cam on' : '&#128683; Cam off';
+  }
+
+  el.btnPreMic.addEventListener('click', function () {
+    S.preMicOn = !S.preMicOn;
+    updatePreCallPills();
+    save();
+  });
+
+  el.btnPreCam.addEventListener('click', function () {
+    S.preCamOn = !S.preCamOn;
+    updatePreCallPills();
+    save();
+  });
+
   el.btnMic.addEventListener('click', toggleMic);
   el.btnHangup.addEventListener('click', function () { doEndCall(true); });
   el.btnCam.addEventListener('click', toggleCam);
@@ -550,6 +587,8 @@
      ============================================================ */
   function init() {
     var hash = location.hash;
+
+    updatePreCallPills();
 
     /* Invite link in URL hash */
     if (hash.indexOf('#join=') === 0) {

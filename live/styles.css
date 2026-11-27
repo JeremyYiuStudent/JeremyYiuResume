@@ -189,6 +189,28 @@ html, body {
 
 .hint { color: var(--muted); font-size: .85rem; }
 
+/* Pre-call toggles */
+.pre-call-toggles {
+  display: flex; gap: 10px; justify-content: center;
+  padding: 0 16px 10px;
+}
+.pill {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--surface); border: 1px solid rgba(255,255,255,.08);
+  color: var(--muted); padding: 8px 16px; border-radius: 20px;
+  font: inherit; font-size: .8rem; cursor: pointer;
+  transition: all .2s;
+}
+.pill.on {
+  background: rgba(74,222,128,.12); border-color: rgba(74,222,128,.25);
+  color: var(--ok);
+}
+.pill.off {
+  background: rgba(239,68,68,.10); border-color: rgba(239,68,68,.2);
+  color: var(--danger);
+}
+.pill:active { transform: scale(.95); }
+
 /* Action bar */
 .actions {
   display: flex; gap: 12px; justify-content: center;
