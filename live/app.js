@@ -8,6 +8,8 @@
   /* ---- Config ---- */
   var CFG = {
     RECONNECT_MS : 5000,
+    HEARTBEAT_MS : 10000,
+    HEARTBEAT_TIMEOUT : 8000,
     TAP_COOLDOWN : 800,
     PEER_PREFIX  : 'live',
     STORAGE_KEY  : 'live-room',
@@ -30,6 +32,8 @@
     reconnTimer: null,
     tapLock    : false,
     connecting : false,
+    hbTimer    : null,
+    hbTimeout  : null,
     preMicOn   : true,
     preCamOn   : true,
   };
@@ -272,12 +276,17 @@
   }
 
   function onConnOpen(conn) {
+    if (S.connected && S.conn && S.conn.open && S.conn !== conn) {
+      try { conn.close(); } catch (e) {}
+      return;
+    }
     if (S.conn && S.conn !== conn) {
       try { S.conn.close(); } catch (e) {}
     }
     S.conn      = conn;
     S.connected = true;
     stopReconnect();
+    startHeartbeat();
     updateStatus();
     playConnect();
     showToast('Connected ♥');
@@ -296,6 +305,7 @@
     if (!S.connected) return;          // debounce
     S.connected = false;
     S.conn      = null;
+    stopHeartbeat();
     updateStatus();
     if (S.inCall) doEndCall(false);    // end call without sending msg
     startReconnect();
@@ -303,13 +313,38 @@
 
   function startReconnect() {
     if (S.reconnTimer) return;
-    connectToPartner();
-    S.reconnTimer = setInterval(connectToPartner, CFG.RECONNECT_MS);
+    updateStatus(true);
+    if (S.role === 'a') {
+      connectToPartner();
+      S.reconnTimer = setInterval(connectToPartner, CFG.RECONNECT_MS);
+    } else {
+      S.reconnTimer = setInterval(connectToPartner, CFG.RECONNECT_MS * 3);
+    }
   }
 
   function stopReconnect() {
     clearInterval(S.reconnTimer);
     S.reconnTimer = null;
+  }
+
+  function startHeartbeat() {
+    stopHeartbeat();
+    S.hbTimer = setInterval(function () {
+      send({ type: 'ping' });
+      S.hbTimeout = setTimeout(function () {
+        console.log('[Live] heartbeat timeout — connection dead');
+        onConnClose();
+      }, CFG.HEARTBEAT_TIMEOUT);
+    }, CFG.HEARTBEAT_MS);
+  }
+
+  function stopHeartbeat() {
+    clearInterval(S.hbTimer);  S.hbTimer = null;
+    clearTimeout(S.hbTimeout); S.hbTimeout = null;
+  }
+
+  function receivedHeartbeat() {
+    clearTimeout(S.hbTimeout); S.hbTimeout = null;
   }
 
   /* ============================================================
@@ -324,6 +359,8 @@
     switch (msg.type) {
       case 'tap':      receiveTap(); break;
       case 'call-end': doEndCall(false); break;
+      case 'ping':     send({ type: 'pong' }); break;
+      case 'pong':     receivedHeartbeat(); break;
     }
   }
 
